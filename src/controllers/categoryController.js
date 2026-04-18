@@ -3,7 +3,8 @@ import { CategoryModel } from '../models/categoryModel.js';
 export const CategoryController = {
   async getCategories(req, res) {
     try {
-      const categories = await CategoryModel.getAll();
+      const { name } = req.query;
+      const categories = await CategoryModel.getAll(name);
       res.json(categories);
     } catch (err) {
       res.status(500).json({ error: err.message });

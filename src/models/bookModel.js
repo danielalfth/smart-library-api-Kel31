@@ -2,13 +2,18 @@ import { pool } from '../config/db.js';
 
 export const BookModel = {
   // Mengambil semua buku dengan nama penulis dan kategori (JOIN)
-  async getAll() {
-    const query = `
+  async getAll(title) {
+    let query = `
       SELECT b.*, a.name as author_name, c.name as category_name 
       FROM books b
       LEFT JOIN authors a ON b.author_id = a.id
       LEFT JOIN categories c ON b.category_id = c.id
     `;
+    if (title) {
+      query += ` WHERE b.title ILIKE $1`;
+      const result = await pool.query(query, [`%${title}%`]);
+      return result.rows;
+    }
     const result = await pool.query(query);
     return result.rows;
   },

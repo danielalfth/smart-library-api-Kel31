@@ -3,7 +3,8 @@ import { BookModel } from '../models/bookModel.js';
 export const BookController = {
   async getAllBooks(req, res) {
     try {
-      const books = await BookModel.getAll();
+      const { title } = req.query;
+      const books = await BookModel.getAll(title);
       res.json(books);
     } catch (err) {
       res.status(500).json({ error: err.message });

@@ -8,6 +8,9 @@ export const LoanModel = {
 
       // 1. Cek ketersediaan buku
       const bookCheck = await client.query('SELECT available_copies FROM books WHERE id = $1', [book_id]);
+      if (bookCheck.rows.length === 0) {
+        throw new Error('Buku dengan ID tersebut tidak ditemukan.');
+      }
       if (bookCheck.rows[0].available_copies <= 0) {
         throw new Error('Buku sedang tidak tersedia (stok habis).');
       }
