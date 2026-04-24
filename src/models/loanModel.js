@@ -100,38 +100,25 @@ export const LoanModel = {
 
   async getTopBorrowers() {
     const query = `
-      WITH borrower_stats AS (
-        SELECT
-          m.id as member_id,
-          COUNT(l.id) as total_loans,
-          MAX(l.loan_date) as last_loan_date
-        FROM members m
-        JOIN loans l ON m.id = l.member_id
-        GROUP BY m.id
-      ),
-      favorite_books AS (
-        SELECT
-          l.member_id,
-          b.title as book_title,
-          COUNT(*) as borrow_count,
-          ROW_NUMBER() OVER (PARTITION BY l.member_id ORDER BY COUNT(*) DESC, MAX(l.loan_date) DESC) as rn
-        FROM loans l
-        JOIN books b ON l.book_id = b.id
-        GROUP BY l.member_id, b.title
-      )
       SELECT
         m.id,
         m.full_name,
         m.email,
         m.member_type,
         m.joined_at,
-        bs.total_loans,
-        fb.book_title as favorite_book,
-        bs.last_loan_date as last_loan
+        COUNT(l.id) as total_loans,
+        (SELECT b.title
+         FROM loans l2
+         JOIN books b ON l2.book_id = b.id
+         WHERE l2.member_id = m.id
+         GROUP BY b.title
+         ORDER BY COUNT(*) DESC, MAX(l2.loan_date) DESC
+         LIMIT 1) as favorite_book,
+        MAX(l.loan_date) as last_loan
       FROM members m
-      JOIN borrower_stats bs ON m.id = bs.member_id
-      JOIN favorite_books fb ON m.id = fb.member_id AND fb.rn = 1
-      ORDER BY bs.total_loans DESC, bs.last_loan_date DESC
+      JOIN loans l ON m.id = l.member_id
+      GROUP BY m.id
+      ORDER BY COUNT(l.id) DESC, MAX(l.loan_date) DESC
       LIMIT 3
     `;
     const result = await pool.query(query);
