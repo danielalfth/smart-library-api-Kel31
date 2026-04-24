@@ -104,7 +104,7 @@ export const LoanModel = {
         SELECT
           m.id as member_id,
           COUNT(l.id) as total_loans,
-          MAX(l.created_at) as last_loan_date
+          MAX(l.loan_date) as last_loan_date
         FROM members m
         JOIN loans l ON m.id = l.member_id
         GROUP BY m.id
@@ -114,7 +114,7 @@ export const LoanModel = {
           l.member_id,
           b.title as book_title,
           COUNT(*) as borrow_count,
-          ROW_NUMBER() OVER (PARTITION BY l.member_id ORDER BY COUNT(*) DESC, MAX(l.created_at) DESC) as rn
+          ROW_NUMBER() OVER (PARTITION BY l.member_id ORDER BY COUNT(*) DESC, MAX(l.loan_date) DESC) as rn
         FROM loans l
         JOIN books b ON l.book_id = b.id
         GROUP BY l.member_id, b.title
