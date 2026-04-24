@@ -50,7 +50,24 @@ export const LoanController = {
   async getTopBorrowers(req, res) {
     try {
       const borrowers = await LoanModel.getTopBorrowers();
-      res.json(borrowers);
+
+      const formattedData = borrowers.map(b => ({
+        member_id: b.id,
+        full_name: b.full_name,
+        email: b.email,
+        member_type: b.member_type,
+        total_loans: parseInt(b.total_loans),
+        last_loan_date: b.last_loan,
+        favorite_book: {
+          title: b.favorite_book,
+          times_borrowed: parseInt(b.times_borrowed)
+        }
+      }));
+
+      res.json({
+        message: "top 3 peminjaman buku berhasil diambil",
+        data: formattedData
+      });
     } catch (err) {
       res.status(500).json({ error: err.message });
     }

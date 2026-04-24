@@ -114,6 +114,18 @@ export const LoanModel = {
          GROUP BY b.title
          ORDER BY COUNT(*) DESC, MAX(l2.loan_date) DESC
          LIMIT 1) as favorite_book,
+        (SELECT COUNT(*)
+         FROM loans l3
+         JOIN books b ON l3.book_id = b.id
+         WHERE l3.member_id = m.id AND b.title = (
+           SELECT b2.title
+           FROM loans l4
+           JOIN books b2 ON l4.book_id = b2.id
+           WHERE l4.member_id = m.id
+           GROUP BY b2.title
+           ORDER BY COUNT(*) DESC, MAX(l4.loan_date) DESC
+           LIMIT 1
+         )) as times_borrowed,
         MAX(l.loan_date) as last_loan
       FROM members m
       JOIN loans l ON m.id = l.member_id
