@@ -7,5 +7,6 @@ router.get('/', LoanController.getLoans);
 router.get('/:id', LoanController.getLoanById);
 router.post('/', LoanController.createLoan);
 router.post('/:id/return', LoanController.returnBook);
+router.get('/top-borrowers', LoanController.getTopBorrowers);
 
 export default router;

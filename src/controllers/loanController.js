@@ -45,5 +45,14 @@ export const LoanController = {
     } catch (err) {
       res.status(400).json({ error: err.message });
     }
+  },
+
+  async getTopBorrowers(req, res) {
+    try {
+      const borrowers = await LoanModel.getTopBorrowers();
+      res.json(borrowers);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
   }
 };
